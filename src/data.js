@@ -1,4 +1,4 @@
-{
+export const data = {
   Kyivska: {
     G: {
       2017: {
