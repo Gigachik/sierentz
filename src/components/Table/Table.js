@@ -5,29 +5,46 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import React from "react";
+import React, { useContext } from "react";
 import { data } from "../../data";
+import { TableContext } from "../../contexts/context";
 
 const TableInfo = () => {
-  const popupOpen = () => {
+  const popupOpen = (id) => {
     const left = (window.innerWidth - 700) / 2;
     const top = (window.innerHeight - 700) / 2;
     window.open(
-      "/popup",
+      `/popup/${id}`,
       "_blank",
-      `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no,top=${top},left=${left},width=700,height=700`
+      "toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no,top=${top},left=${left},width=700,height=700"
     );
   };
-  const years = [2017, 2018, 2019];
-  const yearsSectors = ["XX", "YY", "ZZ"];
-  const tableData = Object.entries(data);
+  const [tableValue] = useContext(TableContext);
+  const tableData = Object.entries(tableValue);
+  const yearsArrays = tableData
+    .map(([regionName, { G: regionData }]) => Object.keys(regionData))
+    .reduce((initial, current) => initial.concat(current), []);
+
+  const years = [...new Set(yearsArrays)];
+
+  const sectorsArrays = tableData
+    .map(([regionName, { G: regionData }]) => {
+      const allSectors = [];
+      Object.values(regionData).forEach((sectors) =>
+        Object.keys(sectors).forEach((sector) => allSectors.push(sector))
+      );
+      return allSectors;
+    })
+    .reduce((initial, current) => initial.concat(current), []);
+
+  const sectors = [...new Set(sectorsArrays)];
 
   return (
     <TableContainer component={Paper}>
       <Table
-        sx={{ minWidth: 650 }}
         aria-label="simple table"
         sx={{
+          minWidth: 650,
           th: {
             borderRight: "1px solid rgba(224, 224, 224, 1)",
           },
@@ -48,7 +65,7 @@ const TableInfo = () => {
               regions
             </TableCell>
             {years.map((year) =>
-              yearsSectors.map((sector, index) => (
+              sectors.map((sector, index) => (
                 <TableCell align="center" key={index}>
                   {sector}
                 </TableCell>
@@ -73,15 +90,17 @@ const TableInfo = () => {
               >
                 {regionName}
               </TableCell>
-              {years.map((year) =>
-                yearsSectors.map((sector, index) => (
+              {years.map((year, yearsIndex) =>
+                sectors.map((sector, index) => (
                   <TableCell
                     key={index}
-                    onClick={popupOpen}
+                    onClick={() => {
+                      popupOpen(`${regionName}-G-${year}-${sector}`);
+                    }}
                     style={{ cursor: "pointer" }}
                     align="center"
                   >
-                    {regionData[year]?.[sector].value || "-"}
+                    {regionData[year]?.[sector].value ?? "-"}
                   </TableCell>
                 ))
               )}

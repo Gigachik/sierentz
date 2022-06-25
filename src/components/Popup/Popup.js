@@ -11,13 +11,20 @@ import Grid from "@mui/material/Grid";
 import { TextField } from "../UI/TextField/TextField";
 import { SelectField } from "../UI/SelectField/SelectField";
 import Button from "@mui/material/Button";
+import { useContext } from "react";
+import { TableContext } from "../../contexts/context";
+import { useParams } from "react-router-dom";
 
 const Popup = () => {
   const [value, setValue] = useState([]);
+  const [tableValue, updateCellValue] = useContext(TableContext);
+  console.log("popup--", { tableValue });
+  const { id } = useParams();
+
   const current = new Date();
-  const date = `${current.getDate()}-${
+  const date = `${current.getDate()}.${
     current.getMonth() + 1
-  }-${current.getFullYear()}`;
+  }.${current.getFullYear()}`;
 
   const defaultValues = [
     { value: 4, date: "20.02.2022", user: "Petro", comment: "any" },
@@ -38,7 +45,7 @@ const Popup = () => {
         comment: values.comment,
       };
       setValue((prevState) => [...prevState, newValues]);
-      console.log(values);
+      updateCellValue(id, values.value);
     } catch (error) {
       console.log("error");
     }
@@ -55,8 +62,8 @@ const Popup = () => {
     >
       {(props) => (
         <Form>
-          <Grid container>
-            <Grid container columnSpacing={2} xs={10}>
+          <Grid container columnSpacing={2} alignItems={"end"}>
+            <Grid item columnSpacing={2} xs={10}>
               <Grid item marginY={2} xs={12}>
                 <TableContainer component={Paper}>
                   <Table aria-label="simple table">
@@ -93,35 +100,42 @@ const Popup = () => {
                   </Table>
                 </TableContainer>
               </Grid>
-              <Grid item xs={3}>
-                <Field
-                  name="value"
-                  type="number"
-                  label="Value"
-                  component={TextField}
-                />
-              </Grid>
-              <Grid item xs={3}>
-                <Field name="date" type="text" disabled component={TextField} />
-              </Grid>
-              <Grid item xs={3}>
-                <Field
-                  name="user"
-                  as="select"
-                  label="User"
-                  component={SelectField}
-                />
-              </Grid>
-              <Grid item xs={3}>
-                <Field
-                  name="comment"
-                  type="text"
-                  label="Comment"
-                  component={TextField}
-                />
+              <Grid container columnSpacing={2}>
+                <Grid item xs={3}>
+                  <Field
+                    name="value"
+                    type="number"
+                    label="Value"
+                    component={TextField}
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <Field
+                    name="date"
+                    type="text"
+                    disabled
+                    component={TextField}
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <Field
+                    name="user"
+                    as="select"
+                    label="User"
+                    component={SelectField}
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <Field
+                    name="comment"
+                    type="text"
+                    label="Comment"
+                    component={TextField}
+                  />
+                </Grid>
               </Grid>
             </Grid>
-            <Grid container xs={2} marginLeft={2}>
+            <Grid item xs={2}>
               <Grid item marginTop={"auto"} xs={12}>
                 <Button type="submit" variant="contained" fullWidth>
                   Add
